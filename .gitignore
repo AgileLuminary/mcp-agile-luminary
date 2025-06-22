@@ -100,6 +100,11 @@ dist
 # vuepress build output
 .vuepress/dist
 
+<<<<<<< HEAD
+=======
+.cursor/
+
+>>>>>>> 217ce50 (Initial commit)
 # vuepress v2.x temp and cache directory
 .temp
 .cache
@@ -133,4 +138,8 @@ dist
 .yarn/unplugged
 .yarn/build-state.yml
 .yarn/install-state.gz
+<<<<<<< HEAD
 .pnp.*
+=======
+.pnp.*
+>>>>>>> 217ce50 (Initial commit)

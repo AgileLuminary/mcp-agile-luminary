@@ -1,0 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Agile Luminary MDC Rules
+
+Whenever a user asks for a product description, or you need to know the description of the product. You can call the getProductDescription tool on the Agile Luminary MCP resource and get a description of the product

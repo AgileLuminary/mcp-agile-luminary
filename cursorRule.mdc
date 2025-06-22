@@ -1,0 +1,26 @@
+# Agile Luminary MCP Rule
+
+1. You have three MCP resources available via Agile Luminary MCP:
+   - `getCurrentWork`
+   - `getProductDescription`
+   - `getPastWork`
+
+2. Before performing any user task, *always* call `getCurrentWork` to know the current user stories or tasks assigned.
+
+3. After fetching `getCurrentWork`, automatically call:
+   - `getProductDescription` → to review what the product should achieve.
+   - `getPastWork` → to see what has been done before.
+
+4. Once all three are retrieved, execute the actual task described in the `getCurrentWork` response.
+
+5. Do **not execute** any code or generate content before you have all three responses.
+
+@example
+User: “Let’s work on the next user story.”
+Agent flow:
+- `resources/read` or tool: `getCurrentWork`
+- then `resources/read`: `getProductDescription`
+- then `resources/read`: `getPastWork`
+- then perform the work.
+
+Ensure this sequence is enforced before writing any code or generating content.

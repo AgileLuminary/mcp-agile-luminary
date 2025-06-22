@@ -96,15 +96,8 @@ dist
 # Comment in the public line in if your project uses Gatsby and not Next.js
 # https://nextjs.org/blog/next-9-1#public-directory-support
 # public
-
-# vuepress build output
-.vuepress/dist
-
-<<<<<<< HEAD
-=======
 .cursor/
 
->>>>>>> 217ce50 (Initial commit)
 # vuepress v2.x temp and cache directory
 .temp
 .cache
@@ -138,8 +131,3 @@ dist
 .yarn/unplugged
 .yarn/build-state.yml
 .yarn/install-state.gz
-<<<<<<< HEAD
-.pnp.*
-=======
-.pnp.*
->>>>>>> 217ce50 (Initial commit)

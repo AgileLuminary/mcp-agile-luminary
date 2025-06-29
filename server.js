@@ -2,7 +2,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
-
+const host = 'https://app.agileluminary.com'
 
 async function startStdioServer() {
   const mcps = createMcpServer();
@@ -30,7 +30,7 @@ server.registerTool(
     try {
       const { searchString } = args;
       
-      const apiKey = process.env.API_KEY;
+      const apiKey = process.env.LUMINARY_API_KEY;
       if (!apiKey) {
         console.error('No API key present');
       }
@@ -41,7 +41,7 @@ server.registerTool(
       }
       
       // Send POST request with chatText in body
-      const response = await fetch('http://localhost:5006/bend/mcp/documents/search', {
+      const response = await fetch(`${host}/bend/mcp/documents/search`, {
         method: 'POST',
         headers: {
           ...headers,
@@ -81,15 +81,15 @@ server.registerTool(
     },
     async () => {
       try {
-        const apiKey = process.env.API_KEY;
-        console.error('API_KEY in getCurrentWork:', apiKey);
+        const apiKey = process.env.LUMINARY_API_KEY;
+        console.error('LUMINARY_API_KEY in getCurrentWork:', apiKey);
         
         const headers = {};
         if (apiKey) {
           headers['Authorization'] = apiKey;
         }
         
-        const response = await fetch('http://localhost:5006/bend/mcp/userstories/current', {
+        const response = await fetch(`${host}/bend/mcp/userstories/current`, {
           headers
         });
         
@@ -129,7 +129,7 @@ server.registerTool(
       try {
       const { searchString } = args;
       
-      const apiKey = process.env.API_KEY;
+      const apiKey = process.env.LUMINARY_API_KEY;
       if (!apiKey) {
         console.error('No API key present');
       }
@@ -140,7 +140,7 @@ server.registerTool(
       }
       
       // Send POST request with chatText in body
-      const response = await fetch('http://localhost:5006/bend/mcp/userstories/search', {
+      const response = await fetch(`${host}/bend/mcp/userstories/search`, {
         method: 'POST',
         headers: {
           ...headers,

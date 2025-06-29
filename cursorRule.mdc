@@ -1,26 +1,42 @@
-# Agile Luminary MCP Rule
+# Agile Luminary MCP Rules
 
-1. You have three MCP resources available via Agile Luminary MCP:
+1. You have three MCP tools available via Agile Luminary MCP:
    - `getCurrentWork`
-   - `getProductDescription`
+   - `getRelatedDocuments`
    - `getPastWork`
 
 2. Before performing any user task, *always* call `getCurrentWork` to know the current user stories or tasks assigned.
 
 3. After fetching `getCurrentWork`, automatically call:
-   - `getProductDescription` → to review what the product should achieve.
-   - `getPastWork` → to see what has been done before.
+   - `getRelatedDocuments` → Use relevant keywords from the current work to search for related documentation and specifications.
+   - `getPastWork` → Use relevant keywords from the current work to search for what has been done before on similar tasks.
 
 4. Once all three are retrieved, execute the actual task described in the `getCurrentWork` response.
 
 5. Do **not execute** any code or generate content before you have all three responses.
 
-@example
-User: “Let’s work on the next user story.”
+6. When calling `getRelatedDocuments` and `getPastWork`, use intelligent search strings based on:
+   - Key terms from the current work description
+   - Technology stack mentioned
+   - Feature names or component names
+   - User story themes or requirements
+
+## Example Workflow
+
+User: "Let's work on the next user story."
+
 Agent flow:
-- `resources/read` or tool: `getCurrentWork`
-- then `resources/read`: `getProductDescription`
-- then `resources/read`: `getPastWork`
-- then perform the work.
+1. Call `getCurrentWork` 
+2. Analyze the response to extract key search terms
+3. Call `getRelatedDocuments` with relevant search string (e.g., "authentication", "payment system", "user dashboard")
+4. Call `getPastWork` with relevant search string based on the current work context
+5. Then perform the work using all gathered context
+
+## Search Strategy Guidelines
+
+- For `getRelatedDocuments`: Search for technical specifications, requirements, architecture docs
+- For `getPastWork`: Search for similar features, related user stories, or previous implementations
+- Use multiple calls with different search terms if the current work spans multiple domains
+- Extract meaningful keywords rather than using generic terms
 
 Ensure this sequence is enforced before writing any code or generating content.

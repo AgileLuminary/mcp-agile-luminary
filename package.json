@@ -12,9 +12,6 @@
   "description": "",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.13.0",
-    "axios": "^1.10.0",
-    "express": "^5.1.0",
-    "express-mcp-handler": "^0.3.0",
-    "zod": "^3.25.67"
+    "axios": "^1.10.0"
   }
 }

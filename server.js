@@ -1,11 +1,8 @@
-// server.js
-import express from 'express';
-import { McpServer, ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
-import fs from 'fs'
 
-import { statelessHandler } from 'express-mcp-handler';
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { z } from 'zod';
+
 
 async function startStdioServer() {
   const mcps = createMcpServer();
@@ -18,44 +15,65 @@ function createMcpServer() {
     version: '1.0.0',
   });
 
-  server.registerResource(
-    'greeting',
-    new ResourceTemplate('greeting://{name}', { list: undefined }),
-    { title: 'Greeting', description: 'Generate a greeting' },
-    async (uri, { name }) => ({
-      contents: [{ uri: uri.href, text: `Hello, ${name}!` }]
-    })
-  );
-
-  server.registerTool(
-    'getProductDescription',
-    {
-      title: 'Get Product Description',
-      description: 'Retrieve the current product description from external file'
-    },
-    async () => {
-      try {
-        const filePath = '/Users/erichartmann/Documents/product-description.txt'; 
-        const description = await fs.readFileSync(filePath, { encoding: 'utf8' });
-        
-        return {
-          content: [{ 
-            type: 'text', 
-            text: description.trim()
-          }]
-        };
-      } catch (error) {
-        return {
-          content: [{ 
-            type: 'text', 
-            text: `Error reading product description: ${error.message}`
-          }]
-        };
-      }
-    }
-  );
 
 server.registerTool(
+  'getRelatedDocuments',
+  {
+    title: 'Get Related Documents',
+    description: 'Retrieve related documents based on a search string',
+    inputSchema: {
+      searchString: z.string().min(1),
+    }
+     
+  },
+  async (args) => {
+    try {
+      const { searchString } = args;
+      
+      const apiKey = process.env.API_KEY;
+      if (!apiKey) {
+        console.error('No API key present');
+      }
+     
+      const headers = {};
+      if (apiKey) {
+        headers['Authorization'] = apiKey;
+      }
+      
+      // Send POST request with chatText in body
+      const response = await fetch('http://localhost:5006/bend/mcp/documents/search', {
+        method: 'POST',
+        headers: {
+          ...headers,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ chatText: searchString })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.text();
+      console.log('got server data', data)
+      return {
+        content: [{ 
+          type: 'text', 
+          text: data
+        }]
+      };
+    } catch (error) {
+      return {
+        content: [{ 
+          type: 'text', 
+          text: `Error searching documents: ${error.message}`
+        }]
+      };
+    }
+  }
+);
+
+  server.registerTool(
     'getCurrentWork',
     {
       title: 'Get Current Work',
@@ -63,20 +81,35 @@ server.registerTool(
     },
     async () => {
       try {
-        const filePath = '/Users/erichartmann/Documents/currentWork.txt'; 
-        const description = await fs.readFileSync(filePath, { encoding: 'utf8' });
+        const apiKey = process.env.API_KEY;
+        console.error('API_KEY in getCurrentWork:', apiKey);
+        
+        const headers = {};
+        if (apiKey) {
+          headers['Authorization'] = apiKey;
+        }
+        
+        const response = await fetch('http://localhost:5006/bend/mcp/userstories/current', {
+          headers
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.text();
         
         return {
           content: [{ 
             type: 'text', 
-            text: description.trim()
+            text: data
           }]
         };
       } catch (error) {
         return {
           content: [{ 
             type: 'text', 
-            text: `Error reading product description: ${error.message}`
+            text: `Error fetching current work: ${error.message}`
           }]
         };
       }
@@ -87,24 +120,53 @@ server.registerTool(
     'getPastWork',
     {
       title: 'Get Past Work',
-      description: 'Retrieve the work which has been completed related to this user story'
+      description: 'Retrieve the work which has been completed related to this user story',
+        inputSchema: {
+          searchString: z.string().min(1),
+        }
     },
-    async () => {
+    async (args) => {
       try {
-        const filePath = '/Users/erichartmann/Documents/pastWork.txt'; 
-        const description = await fs.readFileSync(filePath, { encoding: 'utf8' });
+      const { searchString } = args;
+      
+      const apiKey = process.env.API_KEY;
+      if (!apiKey) {
+        console.error('No API key present');
+      }
+     
+      const headers = {};
+      if (apiKey) {
+        headers['Authorization'] = apiKey;
+      }
+      
+      // Send POST request with chatText in body
+      const response = await fetch('http://localhost:5006/bend/mcp/userstories/search', {
+        method: 'POST',
+        headers: {
+          ...headers,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ chatText: searchString })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.text();
+      return {
+        content: [{ 
+          type: 'text', 
+          text: data
+        }]
+      };
         
-        return {
-          content: [{ 
-            type: 'text', 
-            text: description.trim()
-          }]
-        };
+      
       } catch (error) {
         return {
           content: [{ 
             type: 'text', 
-            text: `Error reading product description: ${error.message}`
+            text: `Error getting past work: ${error.message}`
           }]
         };
       }
@@ -114,22 +176,4 @@ server.registerTool(
   return server;
 }
 
-
-if (process.argv.includes('--stdio')) {
-  startStdioServer().catch(console.error);
-} else {
-  // Otherwise start Express-based HTTP/SSE server
-  const app = express();
-  app.use(express.json());
-
-  app.post('/mcp', statelessHandler(() => {
-    const m = createMcpServer();
-    const httpTransport = new StreamableHTTPServerTransport({ url: '/mcp' });
-    m.connect(httpTransport).catch(console.error);
-    return m;
-  }));
-
-  app.get('/health', (_req, res) => res.json({ ok: true }));
-
-  app.listen(3000, () => console.log('🚀 MCP HTTP/SSE server listening at http://localhost:3000/mcp'));
-}
+startStdioServer().catch(console.error);

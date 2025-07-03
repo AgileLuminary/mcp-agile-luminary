@@ -1,0 +1,14 @@
+{
+  "name": "Agile Luminary MCP Server",
+  "version": "1.0.0",
+  "entry": "server.js",
+  "type": "node",
+  "description": "MCP server for Agile Luminary integration.",
+  "author": "Agile Luminary",
+  "dependencies": ["@modelcontextprotocol/sdk", "axios"],
+  "platforms": ["darwin", "win32", "linux"],
+  "mcp": {
+    "port": 3000,
+    "tools": ["getCurrentWork", "getRelatedDocuments", "getPastWork"]
+  }
+}

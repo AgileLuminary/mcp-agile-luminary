@@ -173,6 +173,56 @@ server.registerTool(
     }
   );
 
+  server.registerTool(
+    'finishUserStory',
+    {
+      title: 'Finish User Story',
+      description: 'Mark a user story as finished',
+      inputSchema: {
+        userStoryId: z.string().min(1),
+      }
+    },
+    async (args) => {
+      try {
+        const { userStoryId } = args;
+        const apiKey = process.env.LUMINARY_API_KEY;
+        if (!apiKey) {
+          console.error('No API key present');
+        }
+        const headers = {};
+        if (apiKey) {
+          headers['Authorization'] = apiKey;
+        }
+        // Send POST request to finish the user story
+        const response = await fetch(`${host}/bend/mcp/userstories/finish`, {
+          method: 'POST',
+          headers: {
+            ...headers,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ userStoryId })
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.text();
+        return {
+          content: [{
+            type: 'text',
+            text: data
+          }]
+        };
+      } catch (error) {
+        return {
+          content: [{
+            type: 'text',
+            text: `Error finishing user story: ${error.message}`
+          }]
+        };
+      }
+    }
+  );
+
   return server;
 }
 
